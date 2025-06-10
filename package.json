@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Mtendekuyokwa19/file_uploader/issues"
   },
-  "homepage": "https://github.com/Mtendekuyokwa19/file_uploader#readme"
+  "homepage": "https://github.com/Mtendekuyokwa19/file_uploader#readme",
+  "dependencies": {
+    "@prisma/client": "^6.9.0"
+  }
 }
