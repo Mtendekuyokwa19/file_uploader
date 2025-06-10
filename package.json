@@ -1,0 +1,19 @@
+{
+  "name": "file_uploader",
+  "version": "1.0.0",
+  "description": "File uploader project to learn prisma",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mtendekuyokwa19/file_uploader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mtendekuyokwa19/file_uploader/issues"
+  },
+  "homepage": "https://github.com/Mtendekuyokwa19/file_uploader#readme"
+}
