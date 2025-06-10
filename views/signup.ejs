@@ -9,7 +9,7 @@
 </head>
 <body class="bg-[#2E3440] text-[#fffaf3] h-screen max-h-screen flex flex-col items-stretch">
 		<nav class="flex justify-between p-4 list-none bg-[#81a1c1]">
-			<li> <h1>Umunthu</h1> </li>
+			<li> <h1><a href="/">Umunthu</a></h1> </li>
 			<section class="flex gap-2">
 			<li><a href="/">Home</a></li>
 			<li><a href="login">Login</a></li>
@@ -19,7 +19,19 @@
 
 		</nav>
 		<main  class=" gap-7 flex  justify-center flex-1 items-center flex-col">
+			<p>Sign Up</p>
+<form class="flex p-4 border-gray border gap-2 rounded flex-col" action="/login">
 
+<label for="fullname">fullname</label>
+				<input id="fullname" type="text" class=" bg-slate-300 text-black">
+<label for="email">email</label>
+				<input id="email" type="email" class=" bg-slate-300 text-black">
+<label for="password">password</label>
+				<input id="password" type="password" class=" bg-slate-300 text-black">
+
+
+<button type="submit" class="p-2 bg-[#5e81ac] rounded-md shadow-md ">Sign Up</button>
+			</form>
 
 
 		</main> 
