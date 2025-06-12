@@ -20,14 +20,14 @@
 		</nav>
 		<main  class=" gap-7 flex  justify-center flex-1 items-center flex-col">
 			<p>Sign Up</p>
-<form class="flex p-4 border-gray border gap-2 rounded flex-col" action="/login">
+<form class="flex p-4 border-gray border gap-2 rounded flex-col" action="/signup" method="post">
 
 <label for="fullname">fullname</label>
-				<input id="fullname" type="text" class=" bg-slate-300 text-black">
+				<input id="fullname" name="fullname" type="text" class=" bg-slate-300 text-black">
 <label for="email">email</label>
-				<input id="email" type="email" class=" bg-slate-300 text-black">
+				<input id="email" name="email" type="email" class=" bg-slate-300 text-black">
 <label for="password">password</label>
-				<input id="password" type="password" class=" bg-slate-300 text-black">
+				<input id="password" name="password" type="password" class=" bg-slate-300 text-black">
 
 
 <button type="submit" class="p-2 bg-[#5e81ac] rounded-md shadow-md ">Sign Up</button>
