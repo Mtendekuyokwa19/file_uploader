@@ -12,8 +12,16 @@
 			<li> <h1><a href="/">Umunthu</a></h1> </li>
 			<section class="flex gap-2">
 			<li><a href="/">Home</a></li>
+				<% if(locals.user){%>
+
+			<li><a href="/logout">logout</a></li>
+				<% }
+				else{%>
+
 			<li><a href="login">Login</a></li>
 			<li><a href="/signup">Signup</a></li>
+				<%}
+				%>
 			<li>Github</li>
 			</section>
 

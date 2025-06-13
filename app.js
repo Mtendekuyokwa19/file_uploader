@@ -13,7 +13,7 @@ app.use(
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // ms
     },
-    secret: "a santa at nasa",
+    secret: process.env.SECRET,
     resave: true,
     saveUninitialized: true,
     store: new PrismaSessionStore(new PrismaClient(), {
@@ -23,6 +23,11 @@ app.use(
     }),
   })
 );
+
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 app.use(passport.session());
 
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +36,11 @@ app.set("view engine", "ejs");
 app.use("/", router);
 app.use("signup", router);
 app.use("/login", router);
+app.use("/dashboard/:foldername", router);
+
+app.use("/newfile/:foldername", router);
+app.use("/newfolder", router);
 const random = Math.floor(Math.random() * 50);
 app.listen(3000, function () {
-  console.log(`listening ${3000 + random}`);
+  console.log(`listening ${3000}`);
 });

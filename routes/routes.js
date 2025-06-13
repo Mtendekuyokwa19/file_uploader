@@ -4,13 +4,35 @@ const passport = require("passport");
 // const { PrismaClient } = require("../generated/prisma/");
 const { PrismaClient } = require("../generated/prisma/");
 const bcrypt = require("bcryptjs");
+const { title } = require("node:process");
 const prisma = new PrismaClient();
 require("dotenv").config();
 
 router.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { user: req.user });
 });
 
+router.get("/dashboard", async (req, res) => {
+  if (req.user) {
+    const folders = await prisma.user
+      .findMany({
+        where: {
+          id: req.user.id,
+        },
+        select: {
+          Folder: {
+            select: { title: true },
+          },
+        },
+      })
+      .then((results) => {
+        res.render("dashboard", { user: req.user, folder: results[0].Folder });
+      });
+
+    return;
+  }
+  res.redirect("/");
+});
 router.get("/login", (req, res) => {
   res.render("login");
 });
@@ -36,6 +58,92 @@ router.post("/signup", (req, res) => {
   });
 });
 
+router.post("/newfolder", async (req, res) => {
+  const folder = req.body;
+  await prisma.user
+    .update({
+      where: {
+        id: req.user.id,
+      },
+      data: {
+        Folder: {
+          create: {
+            title: folder.foldername,
+          },
+        },
+      },
+    })
+    .then(() => {});
+
+  res.redirect("/dashboard");
+});
+
+router.post("/newfile/:foldername", async (req, res) => {
+  const file = await prisma.user
+    .update({
+      where: {
+        id: req.user.id,
+      },
+
+      data: {
+        Folder: {
+          update: {
+            where: {
+              title: req.params.foldername,
+            },
+            data: {
+              Files: {
+                create: {
+                  title: req.body.filename,
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+    .then((result) => {
+      res.redirect("/dashboard/" + req.params.foldername);
+    });
+});
+router.get("/dashboard/:foldername", async (req, res) => {
+  if (req.user) {
+    const folders = await prisma.user
+      .findMany({
+        where: {
+          id: req.user.id,
+        },
+        select: {
+          Folder: {
+            select: { title: true },
+          },
+        },
+      })
+      .then(async (results) => {
+        const files = await prisma.file
+          .findMany({
+            where: {
+              Folder: {
+                userId: req.user.id,
+                title: req.params.foldername,
+              },
+            },
+          })
+          .then((files) => {
+            res.render("folder", {
+              user: req.user,
+              slug: req.params.foldername,
+              folder: results[0].Folder,
+              files: files,
+            });
+          });
+        console.log(files);
+      });
+
+    return;
+  }
+  res.redirect("/");
+});
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -44,7 +152,6 @@ passport.use(
           name: username,
         },
       });
-      console.log(user);
       if (!user) {
         return done(null, false, { message: "wrong fullname" });
       }
@@ -61,7 +168,6 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log(null, user.id);
   done(null, user.id);
 });
 passport.deserializeUser(async (id, done) => {
@@ -80,7 +186,7 @@ passport.deserializeUser(async (id, done) => {
 router.post(
   "/login",
   passport.authenticate("local", {
-    successRedirect: "/",
+    successRedirect: "/dashboard",
     failureRedirect: "/",
   })
 );
