@@ -39,6 +39,8 @@ app.use("/login", router);
 app.use("/dashboard/:foldername", router);
 
 app.use("/newfile/:foldername", router);
+
+app.get("/dashboard/:foldername/:filename", router);
 app.use("/newfolder", router);
 const random = Math.floor(Math.random() * 50);
 app.listen(3000, function () {

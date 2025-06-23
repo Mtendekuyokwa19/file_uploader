@@ -6,6 +6,8 @@ const { PrismaClient } = require("../generated/prisma/");
 const bcrypt = require("bcryptjs");
 const { title } = require("node:process");
 const prisma = new PrismaClient();
+const multer = require("multer");
+const uploads = multer({ dest: "../uploads/" });
 require("dotenv").config();
 
 router.get("/", (req, res) => {
@@ -78,34 +80,75 @@ router.post("/newfolder", async (req, res) => {
   res.redirect("/dashboard");
 });
 
-router.post("/newfile/:foldername", async (req, res) => {
-  const file = await prisma.user
-    .update({
+router.get("/dashboard/:foldername/:filename", async (req, res) => {
+  const file = await prisma.file
+    .findUnique({
       where: {
-        id: req.user.id,
-      },
-
-      data: {
         Folder: {
-          update: {
-            where: {
-              title: req.params.foldername,
+          title: req.params.foldername,
+          userId: req.user.id,
+        },
+        title: req.params.filename,
+      },
+    })
+    .then(async (result) => {
+      const folders = await prisma.user
+        .findMany({
+          where: {
+            id: req.user.id,
+          },
+          select: {
+            Folder: {
+              select: { title: true },
             },
-            data: {
-              Files: {
-                create: {
-                  title: req.body.filename,
+          },
+        })
+        .then((folder) => {
+          console.log(result);
+          res.render("file", {
+            slug: req.params.foldername,
+            folder: folder[0].Folder,
+            file: result,
+          });
+        });
+    });
+});
+router.post(
+  "/newfile/:foldername",
+  uploads.single("file"),
+
+  async (req, res) => {
+    const file = await prisma.user
+      .update({
+        where: {
+          id: req.user.id,
+        },
+
+        data: {
+          Folder: {
+            update: {
+              where: {
+                title: req.params.foldername,
+              },
+              data: {
+                Files: {
+                  create: {
+                    title: req.body.filename,
+                    uploadtime: new Date(),
+                    url: req.file.path,
+                    size: req.file.size / 1024,
+                  },
                 },
               },
             },
           },
         },
-      },
-    })
-    .then((result) => {
-      res.redirect("/dashboard/" + req.params.foldername);
-    });
-});
+      })
+      .then((result) => {
+        res.redirect("/dashboard/" + req.params.foldername);
+      });
+  }
+);
 router.get("/dashboard/:foldername", async (req, res) => {
   if (req.user) {
     const folders = await prisma.user

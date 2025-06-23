@@ -29,7 +29,7 @@
 
 		</nav>
 		<main  class=" gap-7 flex  justify-start flex-1 items-start ">
-			<button class="absolute left-5/6 top-3/4 bg-blue-600 p-4 font-bold text-xl rounded-lg" title="newfile" id="newfile">+ </button>
+			<!-- <button class="absolute left-5/6 top-3/4 bg-blue-600 p-4 font-bold text-xl rounded-lg" title="newfile" id="newfile">+ </button> -->
 <section class="w-56 h-screen bg-slate-600 rounded-md"> 
 <section class="flex flex-col gap-2 items-center "> 
 
@@ -55,19 +55,6 @@
 
 			</section>
 
-<dialog class="dialogboxfile absolute top-1/3 left-5/12 w-96 h-56   rounded-md text-white bg-slate-600">
-			<form method="POST" action=<%="/newfile/"+slug%> enctype="multipart/form-data" class="flex flex-col justify-center items-center my-4 gap-2 ">
-					<p class="font-bold">New File</p>
-<label for="file">file Name</label>
-				<input id="file" name="filename" type="text" class=" bg-slate-300 text-black">
-
-				<input id="Folder" name="file" type="file" class=" bg-slate-300 text-black">
-<div class="flex gap-2"> 
-<button type="submit" class="p-2 bg-[#5e81ac] rounded-md shadow-md ">Upload</button>
-<button class="p-2 bg-red-800 rounded-md shadow-md " id="closefile">Close</button>
-</div>
-					</form>
-				</dialog>
 
 <dialog class="dialog absolute top-1/3 left-5/12 w-96 h-56   rounded-md text-white bg-slate-600">
 					<form method="POST" action="/newfolder" class="flex flex-col justify-center items-center my-4 gap-2 ">
@@ -82,7 +69,6 @@
 				</dialog>
 
 <section class="flex gap-2"> 
-		<%files.forEach((file)=>{%>
 
 <section class="flex flex-col justify-center items-center"> 
 <div> 
@@ -90,11 +76,13 @@
 <path d="M 30.398438 2 L 7 2 L 7 48 L 43 48 L 43 14.601563 Z M 30 15 L 30 4.398438 L 40.601563 15 Z"></path>
 </svg>
 				</div>
-			<h3><a href=<%="/dashboard/"+slug+"/"+file.title%>><%=file.title%></a></h3>
+			<h3><%=file.title%></h3>
+		<a href=<%=file.url%> download>download</a>
+	<p><%=file.size%></p>
+			<h3><a href=<%="/delete/"+slug+"/"%>delete</a></h3>
 
 			</section>
 
-		<%})%>
 	</section>
 
 		</main> 
