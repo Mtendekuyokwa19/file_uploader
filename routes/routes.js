@@ -137,6 +137,30 @@ router.get("/dashboard/:foldername/:filename", async (req, res) => {
   });
 });
 
+router.post("/updatefold/:foldername", async (req, res) => {
+  await prisma.folder
+    .update({
+      where: {
+        userId: req.user.id,
+        title: req.params.foldername,
+      },
+      data: {
+        title: req.body.newname,
+      },
+    })
+    .then(() => res.redirect("/dashboard"));
+});
+router.get("/updatefold/:foldername", async (req, res) => {
+  await prisma.folder
+    .findUnique({
+      where: {
+        title: req.params.foldername,
+      },
+    })
+    .then((result) => {
+      res.render(`update`, { name: result });
+    });
+});
 router.get("/deletefold/:foldername", async (req, res) => {
   await prisma.folder.deleteMany({
     where: {
@@ -193,6 +217,7 @@ router.post(
       .update({
         where: {
           id: req.user.id,
+          Folder: {},
         },
 
         data: {
