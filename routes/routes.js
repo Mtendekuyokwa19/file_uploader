@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const LocalStrategy = require("passport-local").Strategy;
 const passport = require("passport");
@@ -8,6 +9,7 @@ const bcrypt = require("bcryptjs");
 const { title } = require("node:process");
 const prisma = new PrismaClient();
 const multer = require("multer");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads/");
@@ -22,7 +24,23 @@ const storage = multer.diskStorage({
 });
 const uploads = multer({ storage: storage });
 require("dotenv").config();
+cloudinary.config({
+  secure: true,
+});
+async function uploadFile(filepath) {
+  const options = {
+    use_filename: true,
+    unique_filename: false,
+    overwrite: true,
+  };
 
+  try {
+    const result = await cloudinary.uploader.upload(filepath, options);
+    return result.public_id;
+  } catch (error) {
+    console.error(error);
+  }
+}
 router.get("/", (req, res) => {
   res.render("index", { user: req.user });
 });
@@ -118,7 +136,7 @@ router.get("/dashboard/:foldername/:filename", async (req, res) => {
       },
     }),
 
-    await prisma.file.findUnique({
+    await prisma.file.findFirst({
       where: {
         Folder: {
           title: req.params.foldername,
@@ -128,7 +146,7 @@ router.get("/dashboard/:foldername/:filename", async (req, res) => {
       },
     }),
   ]).then((result) => {
-    console.log(req.params.fold);
+    console.log(result[1]);
     res.render("file", {
       slug: req.params.foldername,
       folder: result[0][0].Folder,
@@ -208,11 +226,47 @@ router.post(
       });
   }
 );
+
+const createImageTag = (publicId) => {
+  // Set the effect color and background color
+
+  // Create an image tag with transformations applied to the src URL
+  let imageTag = cloudinary.image(publicId);
+
+  return imageTag;
+};
+const getAssetInfo = async (publicId) => {
+  // Return colors in the response
+  const options = {
+    colors: true,
+  };
+
+  try {
+    // Get details about the asset
+    const result = await cloudinary.api.resource(publicId, options);
+    return result.colors;
+  } catch (error) {
+    console.error(error);
+  }
+};
 router.post(
   "/newfile/:foldername",
   uploads.single("file"),
 
   async (req, res) => {
+    const publicId = await uploadFile(req.file.path);
+
+    const colors = await getAssetInfo(publicId);
+
+    const filetag = await createImageTag(publicId);
+
+    const url = filetag
+      .split(" ")[1]
+      .slice(4, -1)
+      .split("")
+      .slice(1, -2)
+      .join("");
+    console.log("here", url);
     const file = await prisma.user
       .update({
         where: {
@@ -231,7 +285,7 @@ router.post(
                   create: {
                     title: req.body.filename,
                     uploadtime: new Date(),
-                    url: req.file.path,
+                    url: url,
                     size: req.file.size / 1024,
                   },
                 },
