@@ -93,6 +93,18 @@ router.post("/newfolder", async (req, res) => {
   res.redirect("/dashboard");
 });
 
+router.get("/delete/:foldername/:filename", async (req, res) => {
+  await prisma.file.delete({
+    where: {
+      Folder: {
+        title: req.params.foldername,
+        userId: req.user.id,
+      },
+      title: req.params.filename,
+    },
+  });
+  res.redirect(`/dashboard/${req.params.foldername}`);
+});
 router.get("/dashboard/:foldername/:filename", async (req, res) => {
   await Promise.all([
     prisma.user.findMany({

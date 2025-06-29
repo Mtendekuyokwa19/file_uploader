@@ -80,6 +80,8 @@
 				<% if(file){%>
 			<h3><%=file.title%></h3>
 		<a href=<%="/"+file.url+""%> >download</a>
+		<a href=<%="/delete/"+slug+"/"+file.title%> >delete</a>
+
 	<p><%=file.size%></p>
 			<h3><a href=<%="/delete/"+slug+"/"%>delete</a></h3>
 		<%}%>
