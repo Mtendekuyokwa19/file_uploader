@@ -35,8 +35,8 @@
 <section class="flex flex-col gap-2 items-center "> 
 
 
-			<button id="openmodal" class="bg-green-600 p-2 my-4">+ Add Folder</button>
-
+			<!-- <button id="openmodal" class="bg-green-600 p-2 my-4">+ Add Folder</button> -->
+			<!---->
 				</section>
 
 				<% folder.forEach((newfolder)=>{%>
@@ -83,7 +83,8 @@
 		<a href=<%="/delete/"+slug+"/"+file.title%> >delete</a>
 
 	<p><%=file.size%></p>
-			<h3><a href=<%="/delete/"+slug+"/"%>delete</a></h3>
+		<h3><a href=<%="/delete/"+slug+"/"%>>delete</a></h3>
+	<button id="openmodal">update</button>
 		<%}%>
 			</section>
 

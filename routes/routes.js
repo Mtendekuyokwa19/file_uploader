@@ -136,6 +136,54 @@ router.get("/dashboard/:foldername/:filename", async (req, res) => {
     });
   });
 });
+
+router.get("/deletefold/:foldername", async (req, res) => {
+  await prisma.folder.deleteMany({
+    where: {
+      title: req.params.foldername,
+    },
+  });
+  res.redirect(`/dashboard`);
+});
+router.post(
+  "/update/:foldername/:filename",
+  uploads.single("file"),
+
+  async (req, res) => {
+    const file = await prisma.user
+      .update({
+        where: {
+          id: req.user.id,
+        },
+
+        data: {
+          Folder: {
+            update: {
+              where: {
+                title: req.params.foldername,
+              },
+              data: {
+                Files: {
+                  update: {
+                    title: req.body.filename,
+                    uploadtime: new Date(),
+                    url: req.file.path,
+                    size: req.file.size / 1024,
+                    where: {
+                      title: req.params.filename,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((result) => {
+        res.redirect("/dashboard/" + req.params.foldername);
+      });
+  }
+);
 router.post(
   "/newfile/:foldername",
   uploads.single("file"),

@@ -1,4 +1,5 @@
 const path = require("node:path");
+const ejsLint = require("eslint-plugin-jsx-a11y");
 const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 // const { PrismaClient } = require("./generated/prisma/");
 const { PrismaClient } = require("@prisma/client");
@@ -39,6 +40,7 @@ app.use("/login", router);
 
 app.use("uploads/:image", router);
 app.use("/dashboard/:foldername", router);
+app.use("/deletefold/:foldername", router);
 app.use("/newfile/:foldername", router);
 app.use("/dashboard/:foldername/:filename", router);
 app.use("/newfolder", router);
