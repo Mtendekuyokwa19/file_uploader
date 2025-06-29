@@ -10,6 +10,7 @@
 
 <body class="bg-[#2E3440] text-[#fffaf3] h-screen max-h-screen flex flex-col items-stretch">
 
+
 		<nav class="flex justify-between p-4 list-none bg-[#81a1c1]">
 			<li> <h1><a href="/">Umunthu</a></h1> </li>
 			<section class="flex gap-2">
@@ -46,7 +47,7 @@
 <path d="M45 8L18.044 8.006c-.279-.101-.855-1.02-1.165-1.514C16.112 5.268 15.317 4 14 4H5C3.346 4 2 5.346 2 7v6h1 44 1v-2C48 9.346 46.654 8 45 8zM48 43V16c0-.552-.448-1-1-1H3c-.552 0-1 .448-1 1v27c0 1.657 1.343 3 3 3h40C46.657 46 48 44.657 48 43z"></path>
 </svg>
 				</div>
-					<h3><a href=<%=newfolder.title%> ><%=newfolder.title%></a></h3>
+					<h3><a href=<%="/dashboard/"+newfolder.title%> ><%=newfolder.title%></a></h3>
 
 			</section>
 
@@ -76,11 +77,12 @@
 <path d="M 30.398438 2 L 7 2 L 7 48 L 43 48 L 43 14.601563 Z M 30 15 L 30 4.398438 L 40.601563 15 Z"></path>
 </svg>
 				</div>
+				<% if(file){%>
 			<h3><%=file.title%></h3>
-		<a href=<%=file.url%> download>download</a>
+		<a href=<%="/"+file.url+""%> >download</a>
 	<p><%=file.size%></p>
 			<h3><a href=<%="/delete/"+slug+"/"%>delete</a></h3>
-
+		<%}%>
 			</section>
 
 	</section>

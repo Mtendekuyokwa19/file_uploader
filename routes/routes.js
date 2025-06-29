@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const path = require("path");
 const LocalStrategy = require("passport-local").Strategy;
 const passport = require("passport");
 // const { PrismaClient } = require("../generated/prisma/");
@@ -7,7 +8,19 @@ const bcrypt = require("bcryptjs");
 const { title } = require("node:process");
 const prisma = new PrismaClient();
 const multer = require("multer");
-const uploads = multer({ dest: "../uploads/" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const array = file.originalname.split(".");
+    const extension = array[array.length - 1];
+    console.log(null, uniqueSuffix + "." + extension);
+    cb(null, uniqueSuffix + "." + extension);
+  },
+});
+const uploads = multer({ storage: storage });
 require("dotenv").config();
 
 router.get("/", (req, res) => {
@@ -81,8 +94,19 @@ router.post("/newfolder", async (req, res) => {
 });
 
 router.get("/dashboard/:foldername/:filename", async (req, res) => {
-  const file = await prisma.file
-    .findUnique({
+  await Promise.all([
+    prisma.user.findMany({
+      where: {
+        id: req.user.id,
+      },
+      select: {
+        Folder: {
+          select: { title: true },
+        },
+      },
+    }),
+
+    await prisma.file.findUnique({
       where: {
         Folder: {
           title: req.params.foldername,
@@ -90,28 +114,15 @@ router.get("/dashboard/:foldername/:filename", async (req, res) => {
         },
         title: req.params.filename,
       },
-    })
-    .then(async (result) => {
-      const folders = await prisma.user
-        .findMany({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            Folder: {
-              select: { title: true },
-            },
-          },
-        })
-        .then((folder) => {
-          console.log(result);
-          res.render("file", {
-            slug: req.params.foldername,
-            folder: folder[0].Folder,
-            file: result,
-          });
-        });
+    }),
+  ]).then((result) => {
+    console.log(req.params.fold);
+    res.render("file", {
+      slug: req.params.foldername,
+      folder: result[0][0].Folder,
+      file: result[1],
     });
+  });
 });
 router.post(
   "/newfile/:foldername",
@@ -149,10 +160,16 @@ router.post(
       });
   }
 );
+router.get("/uploads/:image", (req, res) => {
+  console.log(1);
+  res.download(
+    path.join(__dirname, "..", "/uploads/1751177109736-984762240.jpg")
+  );
+});
 router.get("/dashboard/:foldername", async (req, res) => {
   if (req.user) {
-    const folders = await prisma.user
-      .findMany({
+    Promise.all([
+      await prisma.user.findMany({
         where: {
           id: req.user.id,
         },
@@ -161,27 +178,24 @@ router.get("/dashboard/:foldername", async (req, res) => {
             select: { title: true },
           },
         },
-      })
-      .then(async (results) => {
-        const files = await prisma.file
-          .findMany({
-            where: {
-              Folder: {
-                userId: req.user.id,
-                title: req.params.foldername,
-              },
-            },
-          })
-          .then((files) => {
-            res.render("folder", {
-              user: req.user,
-              slug: req.params.foldername,
-              folder: results[0].Folder,
-              files: files,
-            });
-          });
-        console.log(files);
+      }),
+      await prisma.file.findMany({
+        where: {
+          Folder: {
+            userId: req.user.id,
+            title: req.params.foldername,
+          },
+        },
+      }),
+    ]).then((results) => {
+      res.render("folder", {
+        user: req.user,
+        slug: req.params.foldername,
+        folder: results[0][0].Folder,
+        files: results[1],
       });
+      // console.log(results);
+    });
 
     return;
   }
